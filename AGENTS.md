@@ -4,7 +4,7 @@ This file gives AI coding agents the technical context and rules for this reposi
 
 **Canonical sources**
 
-- **Work plan and acceptance criteria:** [CHECKLIST.md](CHECKLIST.md)
+- **Tickets and acceptance criteria:** GitHub issues. Each epic is a parent issue, and its tickets are sub-issues. [CHECKLIST.md](CHECKLIST.md) maps each AIS ID to its issue number.
 - **Model specification:** [docs/model.md](docs/model.md)
 - **Human documentation:** [README.md](README.md)
 - **Judge procedure:** [.claude/skills/judge/SKILL.md](.claude/skills/judge/SKILL.md)
@@ -20,9 +20,9 @@ The repository is a **portfolio piece**. The maintainer writes every line of imp
 Agents have exactly two roles here. Neither role includes writing project code.
 
 1. **Judge** (primary role). When asked to judge a ticket (`/judge AIS-0xx`), follow [.claude/skills/judge/SKILL.md](.claude/skills/judge/SKILL.md) exactly:
-    - grade the work against the ticket's acceptance criteria and the rubric
+    - grade the work against the acceptance criteria in the ticket's GitHub issue and the rubric
     - give a verdict of **PASS** or **CHANGES REQUESTED**
-    - record it in `docs/reviews/`
+    - record it in `docs/reviews/`, and post a summary on the ticket's PR
 
 2. **Tutor**, on request only.
     - Explain concepts (variational free energy, expected free energy, epistemic value, message passing), derive equations, and point to references.
@@ -34,13 +34,15 @@ Agents have exactly two roles here. Neither role includes writing project code.
 - Never create or modify files in `src/`, `tests/`, `experiments/` or `notebooks/`. This holds even when asked to "just fix it", unless the maintainer explicitly overrides this rule in the current message and names the file.
 - Never paste a complete implementation of a stubbed function into chat, a review or a comment.
 - Never weaken, skip, mark as `xfail` or delete a test.
-- Never tick a box in `CHECKLIST.md` without a PASS verdict recorded in `docs/reviews/` for that ticket.
+- Never tick an acceptance criterion in a ticket's issue without a PASS verdict recorded in `docs/reviews/` for that ticket.
+- Never close, reopen, merge, or edit the title or acceptance criteria of an issue or PR. Ticking boxes after a PASS and posting verdict comments are the only GitHub writes allowed.
+- Never create issues unless the maintainer asks.
 - Never round a verdict up. If the evidence is incomplete, the item is PARTIAL or FAIL.
 
 ### Files agents may edit
 
 - `docs/reviews/AIS-*.md` (judge verdicts)
-- the checkbox for a ticket in `CHECKLIST.md`, only after a PASS
+- on GitHub: a verdict comment on the ticket's PR, and, only after a PASS, the AC and Definition-of-done checkboxes in the ticket's issue body
 - documentation outside `src/` and `tests/` (README, `docs/`, CHANGELOG, this file), only when the maintainer asks
 
 ## Build & Development Environment
@@ -202,13 +204,18 @@ Keep documentation in the same PR as the change.
 
 ### Working a ticket
 
-1. Read the ticket and its acceptance criteria in `CHECKLIST.md`.
+1. Find the ticket's issue number in `CHECKLIST.md`, and read its acceptance criteria in the issue.
 2. Branch: `git switch -c feat/AIS-0xx-short-name`.
 3. RED → GREEN → REFACTOR (see above), committing tests and implementation separately.
 4. Update the records required by the table above.
 5. Run `uv run pre-commit run --all-files` and `uv run pytest`.
-6. Ask the judge: `/judge AIS-0xx`.
-7. On CHANGES REQUESTED, address the blocking items and re-judge. On PASS, merge.
+6. Open a PR from the template, with `Closes #N` in the description.
+7. Ask the judge: `/judge AIS-0xx`.
+8. On CHANGES REQUESTED, address the blocking items and re-judge. On PASS, merge. The issue closes automatically, and the epic's progress bar updates.
+
+### Adding a ticket
+
+Use the **Ticket** issue template, attach the issue as a sub-issue of its epic, add an area label, and add a row to `CHECKLIST.md`. Every acceptance criterion must be objectively checkable.
 
 ### Commit messages
 
@@ -233,4 +240,4 @@ All three must be green before merge.
 
 ---
 
-**Note:** This file is for AI agents. For the project overview see README.md. For the work plan see CHECKLIST.md.
+**Note:** This file is for AI agents. For the project overview see README.md. For the work plan see the GitHub issues, indexed in CHECKLIST.md.

@@ -1,5 +1,7 @@
 # Review: AIS-0xx — <ticket title>
 
+- **Issue:** #N
+- **PR:** #N
 - **Date:** YYYY-MM-DD
 - **Commit:** `<sha>`
 - **Branch / range:** `main..feat/AIS-0xx-...`

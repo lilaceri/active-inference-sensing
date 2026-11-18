@@ -35,7 +35,7 @@ uv run python experiments/visualise_episode.py --seed 0 --fog
 
 ## How this was built
 
-- Each feature was developed test-first, against a ticketed [checklist](CHECKLIST.md).
+- Each feature was developed test-first, against tickets tracked as [GitHub issues](https://github.com/lilaceri/active-inference-sensing/issues) (index in [CHECKLIST.md](CHECKLIST.md)).
 - Each ticket was graded by an AI judge against explicit acceptance criteria. The verdicts are in [docs/reviews/](docs/reviews/).
 - The AI did not write the implementation. Design decisions are logged in [docs/decisions/](docs/decisions/).
 

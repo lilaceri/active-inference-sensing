@@ -1,6 +1,6 @@
 ---
 name: judge
-description: Grade a completed ticket (e.g. `/judge AIS-010`) against its acceptance criteria in CHECKLIST.md and the project rubric, then record a PASS or CHANGES REQUESTED verdict in docs/reviews/. Use when the maintainer asks to judge, grade, review or sign off a ticket. Never writes or fixes project code.
+description: Grade a completed ticket (e.g. `/judge AIS-010`) against the acceptance criteria in its GitHub issue and the project rubric, record a PASS or CHANGES REQUESTED verdict in docs/reviews/, and post it on the ticket's PR. Use when the maintainer asks to judge, grade, review or sign off a ticket. Never writes or fixes project code.
 ---
 
 # Judge a ticket
@@ -11,6 +11,10 @@ You are a strict, sceptical examiner. The maintainer wrote the code, and your jo
 
 A ticket ID, e.g. `AIS-010`. If none is given, ask for one. Don't guess.
 
+## GitHub access
+
+Use whichever GitHub tooling is available: the GitHub MCP tools (`issue_read`, `pull_request_read`, `add_issue_comment`, `issue_write`) or the `gh` CLI (`gh issue view`, `gh pr view`, `gh pr comment`, `gh issue edit`). If neither is available, grade from the issue text the maintainer pastes, and say in the review that you couldn't post to GitHub.
+
 ## Hard rules
 
 - Do **not** edit anything in `src/`, `tests/`, `experiments/` or `notebooks/`.
@@ -18,15 +22,21 @@ A ticket ID, e.g. `AIS-010`. If none is given, ask for one. Don't guess.
 - Every rubric score cites evidence: `file:line`, a command and its output, or a commit SHA.
 - When the evidence is missing or ambiguous, the score is PARTIAL or FAIL, never PASS.
 - Restore the working tree exactly as you found it (`git stash` / `git stash pop`, `git switch -`). Check with `git status` at the end.
+- These are the only GitHub writes allowed:
+    - one verdict comment on the PR
+    - after a PASS, ticking checkboxes in the issue body
+- Never close, reopen or merge anything. Never edit the wording of the acceptance criteria.
 
 ## Procedure
 
 1. **Locate the ticket.**
-    - Read its section in `CHECKLIST.md`: the description and every acceptance criterion.
+    - Find the AIS ID in `CHECKLIST.md` to get the issue number.
+    - Read the issue body: the description, every acceptance criterion, and the Definition of done.
+    - Find the PR that references the issue (`Closes #N`), if there is one.
     - Read the relevant parts of `docs/model.md` and `AGENTS.md`.
 2. **Collect the change.**
     - `git log --oneline main..HEAD`. If the work is on `main`, use the commits whose messages carry `[AIS-0xx]`.
-    - `git diff main...HEAD` (or the equivalent commit range).
+    - `git diff main...HEAD`.
     - Note the HEAD SHA.
 3. **Run the checks** and keep the output tail for evidence:
     - `uv run pre-commit run --all-files`
@@ -40,15 +50,18 @@ A ticket ID, e.g. `AIS-010`. If none is given, ask for one. Don't guess.
 6. **Decide the verdict.**
     - **PASS** only if every acceptance criterion is met, no rubric item is FAIL, and checks and tests are green.
     - Otherwise **CHANGES REQUESTED**, listing the blocking items first.
-7. **Write the review** to `docs/reviews/AIS-0xx.md`, using `docs/reviews/0000-template.md`. If a review already exists, append a new dated section rather than overwriting the earlier one.
-8. **On PASS only,** tick the ticket's box in `CHECKLIST.md`. Change nothing else.
-9. **Report** the verdict and the blocking items to the maintainer in chat (short). Link the review file.
+7. **Write the review** to `docs/reviews/AIS-0xx.md`, using `docs/reviews/0000-template.md`. If a review already exists, append a new dated section rather than overwriting the earlier one. Tell the maintainer to commit it on the ticket branch.
+8. **Post to GitHub.**
+    - Comment on the PR (or on the issue, if there is no PR yet) with the verdict, the rubric table, the blocking items, and the path to the review file.
+    - End the comment with the line `_Posted by the judge agent ([Claude Code](https://claude.ai/code))_`.
+9. **On PASS only,** edit the issue body to tick the acceptance criteria and the Definition-of-done boxes. Change nothing else in the body.
+10. **Report** the verdict and the blocking items to the maintainer in chat (short). Link the review file and the comment.
 
 ## Rubric
 
 | # | Item | PASS means |
 |---|------|-----------|
-| 1 | Acceptance criteria | Every criterion in CHECKLIST.md is demonstrably met, and each is cited. |
+| 1 | Acceptance criteria | Every criterion in the issue is demonstrably met, and each is cited. |
 | 2 | TDD evidence | Targeted tests exist, they precede or accompany the implementation in history, and the mutation check makes them fail. |
 | 3 | Mathematical correctness | The implementation matches `docs/model.md`. Distributions are normalised on the documented axis, shapes follow the AGENTS.md conventions, logs go through `log_stable`, and there are no silent broadcasting errors. |
 | 4 | Test quality | Tests are deterministic (seeded `Generator`) and check against independent oracles where applicable. Tolerances are explicit and justified. Edge cases are covered (one-hot, uniform, zeros, uninformative sensor). No weakened or skipped assertions. |
